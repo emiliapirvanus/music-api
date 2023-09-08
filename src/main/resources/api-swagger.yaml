@@ -1,0 +1,270 @@
+openapi: 3.0.0
+
+info:
+  title: Spocifai API
+  description: API for Music
+  version: 1.0.0
+  contact:
+    name: emilia.pirvanus@gmail.com
+    email: example@example.com
+
+servers:
+  - url: '{{_hostUrl_}}'
+    description: Server 
+
+tags:
+  - name: Artists
+
+paths:
+  /artists:    
+    get:
+      tags:
+        - Artists
+      summary: Fetch all the artists from server
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtistsGetDto"
+
+    post:
+      tags:
+        - Artists
+      summary: Create an artist record 
+      requestBody: 
+        description: The artist full details
+        required: true
+        content: 
+          application/json: 
+            schema: 
+              $ref: "#/components/schemas/ArtistPostDto"       
+      responses: 
+        201:
+          description: Created
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  artistId:
+                    type: integer
+                    example: 883
+    
+  /artists/{artistId}:
+    get: 
+      tags:
+        - Artists
+      summary: Fetch artist's details. TODO Later
+      parameters:
+        - in: path
+          name: artistId
+          required: true
+          schema:
+            type: integer
+            example: 883
+      responses: 
+        200: 
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/ArtistDto"
+    
+    patch:
+      tags:
+        - Artists
+      summary: Edit an artist record 
+      parameters:
+        - in: path
+          name: artistId
+          required: true
+          schema:
+            type: integer
+            example: 883
+      requestBody: 
+        description: The artist full details
+        required: true
+        content: 
+          application/json: 
+            schema: 
+              $ref: "#/components/schemas/ArtistPostDto"       
+      responses: 
+        200:
+          description: OK. The record has been edited and saved
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  artistId:
+                    type: integer
+                    example: 883
+
+  /artists/{artistId}/albums:
+    get: 
+      tags:
+        - Artists
+      summary: Fetch artist's albums 
+      parameters:
+        - in: path
+          name: artistId
+          required: true
+          schema:
+            type: integer
+      responses: 
+        200: 
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/AlbumsGetDto"
+
+
+  /artists/{artistId}/albums/{albumId}/songs:
+    get:
+      tags:
+        - Artists
+      summary: Fetch all songs for given artist and album
+      parameters: 
+        - in: path
+          name: artistId
+          required: true
+          description: The artist id
+          schema:
+            type:
+              number 
+          example: 883
+        - in: path
+          name: albumId
+          required: true
+          description: The artist's album id
+          schema:
+            type:
+              number 
+          example: 1
+      responses: 
+        200: 
+          description: OK
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/ArtistAlbumSongsGetDto"
+
+components:
+  schemas:
+    ArtistsGetDto:
+      properties:  
+        artists:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArtistDto"
+    
+    ArtistDto:
+      properties:
+        id:
+          type: integer
+          example: 883
+          default: The unique identifier of the artist
+        name:
+          type: string
+          example: Dua Lipa
+        description:
+          type: string
+          example: Artist description
+        musicTypes:
+          type: array
+          items:
+            type: string
+          example:
+            - pop
+            - rock
+            - mane
+        imageUrl:
+          type: string
+          format: url
+          example: https://my-image.com/282628
+
+    AlbumsGetDto:
+      properties:
+        id:
+          type: string
+          example: 11
+        name:
+          type: string
+          example: Album1
+        description:
+          type: string
+          example: Album description
+
+
+    ArtistAlbumSongsGetDto:
+      properties:
+        id:
+          type: integer
+          example: 23
+        name:
+          type: string
+          example: Paint the town red
+        musicType:
+          type: string
+          example: pop
+        youtubeUrl:
+          type: string
+          format: url
+          example: https://youtube.com/2879-62as-af34-cdas
+
+    ArtistPostDto:
+      properties:
+        name: 
+          type: string
+          example: Dua Lipa
+        description:
+          type: string
+          example: Artist description
+        musicTypes:
+          type: array
+          items:
+            type: string
+          example:
+            - pop
+            - rock
+            - mane
+        imageUrl:
+          type: string
+          format: url
+          example: "https://my-image.com/282628"
+        albums:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Album1
+              description:
+                type: string
+                example: Album description
+              songs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Paint the town red
+                    musicType:
+                      type: string
+                      example: pop
+                    youtubeUrl:
+                      type: string
+                      format: url
+                      example: "https://youtube.com/2879-62as-af34-cdas"
+                    
+
+
+
+        
+
+        
