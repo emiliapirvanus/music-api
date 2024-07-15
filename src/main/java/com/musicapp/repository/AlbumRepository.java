@@ -12,4 +12,6 @@ public interface AlbumRepository extends JpaRepository<AlbumEntity, Integer> {
     AlbumEntity findByName(String name);
 //    @Query("select * from AlbumEntity where artistId = :artistId")
     List<AlbumEntity> findAllByArtistId(Integer artistId);
+
+
 }

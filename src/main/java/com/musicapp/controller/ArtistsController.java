@@ -98,6 +98,7 @@ public class ArtistsController implements ArtistsApi {
             responseBody.setArtistId(savedEntity.getId());
 
             return ResponseEntity.status(201).body(responseBody);
+
         }
     }
 
@@ -154,15 +155,6 @@ public class ArtistsController implements ArtistsApi {
         artistDto.setImageUrl(artistEntity.getImageUrl());
         artistDto.setMusicTypes(convertCommaSeparedStringToList(artistEntity.getMusicTypes()));
 
-        List<AlbumsGetDto> albumsGetDtoList = new ArrayList<>();
-
-        for (AlbumEntity albumEntity : artistEntity.getAlbums()) {
-
-            AlbumsGetDto albumsGetDto = convertAlbumEntityToDto(albumEntity);
-            albumsGetDtoList.add(albumsGetDto);
-
-        }
-
         return artistDto;
 
     }
@@ -173,13 +165,6 @@ public class ArtistsController implements ArtistsApi {
         }
         String[] types = musicTypes.split(",");
         return Arrays.asList(types);
-    }
-
-    private AlbumsGetDto convertAlbumEntityToDto(AlbumEntity album) {
-
-
-
-        return null;
     }
 
     private static AlbumEntity convertToAlbumEntity(ArtistPostDtoAlbumsInner album) {
@@ -205,39 +190,57 @@ public class ArtistsController implements ArtistsApi {
         return songEntity;
     }
 
+    private static ArtistAlbumSongsGetDtoInner convertSongsToDto (SongEntity songEntity){
+
+        ArtistAlbumSongsGetDtoInner artistAlbumSongsGetDto = new ArtistAlbumSongsGetDtoInner();
+        artistAlbumSongsGetDto.setId(songEntity.getId());
+        artistAlbumSongsGetDto.setName(songEntity.getName());
+        artistAlbumSongsGetDto.setMusicType(songEntity.getMusicType());
+        artistAlbumSongsGetDto.setYoutubeUrl(songEntity.getUrl());
+
+        return artistAlbumSongsGetDto;
+    }
 
     @Override
-    public ResponseEntity<ArtistAlbumSongsGetDto> artistsArtistIdAlbumsAlbumIdSongsGet(BigDecimal artistId,
+    public ResponseEntity<List<ArtistAlbumSongsGetDtoInner>> artistsArtistIdAlbumsAlbumIdSongsGet(BigDecimal artistId,
                                                                                        BigDecimal albumId) {
-        artistsArtistIdAlbumsGet(artistId.intValue());
 
+        List<SongEntity> allSongsByAlbumId = songRepo.findAllByAlbumId(albumId.intValue());
 
+        List<ArtistAlbumSongsGetDtoInner> albumSongsGetDto = new ArrayList<>();
+        for (SongEntity songEntity: allSongsByAlbumId){
 
-
-        return null;
+            ArtistAlbumSongsGetDtoInner artistAlbumSongsGetDto = convertSongsToDto(songEntity);
+            albumSongsGetDto.add(artistAlbumSongsGetDto);
+        }
+        return ResponseEntity.ok(albumSongsGetDto);
     }
 
     @Override
-    public ResponseEntity<AlbumsGetDto> artistsArtistIdAlbumsGet(Integer artistId) {
+    public ResponseEntity<List<AlbumsGetDtoInner>> artistsArtistIdAlbumsGet(Integer artistId) {
 
-        List<ArtistEntity> artists = findAllArtistsFromRepo();
+        List<AlbumEntity> allByArtistId = albumRepo.findAllByArtistId(artistId);
 
-        ArtistEntity artist = artists.stream().filter(a -> Objects.equals(a.getId(), artistId)).findFirst().orElse(null);
-        List<AlbumsGetDto> albumEntities = new ArrayList<>();
-
-        for (AlbumEntity album : artist.getAlbums()) {
-
-            AlbumsGetDto albumsGetDto = convertAlbumsToDto(album);
-            albumEntities.add(albumsGetDto);
+        for (AlbumEntity album : allByArtistId){
+            List<SongEntity> songByAlbumId = songRepo.findAllByAlbumId(album.getId());
+            album.setSongs(songByAlbumId);
         }
-//        return ResponseEntity.ok(albumEntities);
-        return null;   // schema nu mi permite sa afisez toate albumele?
+
+        List<AlbumsGetDtoInner> albumsGetDtoInners = new ArrayList<>();
+
+        for (AlbumEntity album : allByArtistId) {
+
+            AlbumsGetDtoInner albumsGetDto = convertAlbumsToDto(album);
+            albumsGetDtoInners.add(albumsGetDto);
+    }
+
+        return  ResponseEntity.ok(albumsGetDtoInners);
 
     }
 
-    private AlbumsGetDto convertAlbumsToDto(AlbumEntity albumEntity){
+    private AlbumsGetDtoInner convertAlbumsToDto(AlbumEntity albumEntity){
 
-        AlbumsGetDto albumsGetDto = new AlbumsGetDto();
+        AlbumsGetDtoInner albumsGetDto = new AlbumsGetDtoInner();
 
         albumsGetDto.setId(albumEntity.getId().toString()); //// dc e string?
         albumsGetDto.setName(albumEntity.getName());

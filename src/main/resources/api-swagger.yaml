@@ -187,33 +187,39 @@ components:
           example: https://my-image.com/282628
 
     AlbumsGetDto:
-      properties:
-        id:
-          type: string
-          example: 11
-        name:
-          type: string
-          example: Album1
-        description:
-          type: string
-          example: Album description
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: 11
+          name:
+            type: string
+            example: Album1
+          description:
+            type: string
+            example: Album description
 
 
     ArtistAlbumSongsGetDto:
-      properties:
-        id:
-          type: integer
-          example: 23
-        name:
-          type: string
-          example: Paint the town red
-        musicType:
-          type: string
-          example: pop
-        youtubeUrl:
-          type: string
-          format: url
-          example: https://youtube.com/2879-62as-af34-cdas
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 23
+          name:
+            type: string
+            example: Paint the town red
+          musicType:
+            type: string
+            example: pop
+          youtubeUrl:
+            type: string
+            format: url
+            example: https://youtube.com/2879-62as-af34-cdas
 
     ArtistPostDto:
       properties:
